@@ -11,6 +11,7 @@ const Editor = () => {
     useEffect(() => {
         localStorage.setItem('notes', JSON.stringify(data));
     }, [data]);
+    console.log(data);
 
     const handleButtonClick = (markdownSyntax) => {
         setData(prev => {
@@ -25,10 +26,14 @@ const Editor = () => {
         });
     };
 
+    function abc () {
+        return '#Add title';
+    }
+
     return (
         <div className='entire-page' style={{ display: 'flex', margin: '10px 0px', gap: '40px' }}>
             <div className='sidebar' style={{ width: '150px' }}>
-                <button style={{ padding: '5px 25px' }} onClick={() => { setData(prevValue => [...prevValue, "#Add title"]) }}>ADD Notes +</button>
+                <button style={{ padding: '5px 25px' }} onClick={() => { setData(prevValue => [...prevValue, abc()]) }}>ADD Notes +</button>
                 <hr />
                 <div>
                     {data.map((markdown, index) => (
@@ -48,6 +53,7 @@ const Editor = () => {
                             }}
                         >
                             {markdown}
+                            
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
@@ -66,14 +72,12 @@ const Editor = () => {
                 </div>
             </div>
             <div className='main'>
-                <button onClick={() => setShowPreview(prev => !prev)}>
-                    {showPreview ? "code" : "preview"}
-                </button>
+        
                 <div>
                     {!showPreview ?
-                        (<LeftSection data={data} setData={setData} selectedIndex={selectedIndex} handleButtonClick={handleButtonClick} />)
+                        (<LeftSection data={data} setData={setData} selectedIndex={selectedIndex} handleButtonClick={handleButtonClick} setShowPreview={setShowPreview} showPreview={showPreview}/>)
                         :
-                        (<RightSection data={data} selectedIndex={selectedIndex} />)
+                        (<RightSection data={data} selectedIndex={selectedIndex} showPreview={showPreview} setShowPreview={setShowPreview}/>)
                     }
                 </div>
             </div>
@@ -81,7 +85,8 @@ const Editor = () => {
     )
 }
 
-const LeftSection = ({ data, setData, selectedIndex, handleButtonClick }) => {
+
+const LeftSection = ({ data, setData, selectedIndex, handleButtonClick, setShowPreview, showPreview }) => {
     const buttons = [
         { label: <FaHeading />, markdown: '\n# ' },
         { label: <FaBold />, markdown: '\n** ' },
@@ -95,10 +100,14 @@ const LeftSection = ({ data, setData, selectedIndex, handleButtonClick }) => {
 
     return (
         <div>
-            <div className="all-btns" style={{ gap: '10px' }}>
+            <div className="all-btns" style={{display:'flex', gap:'50px'}}>
+                <button onClick={() => setShowPreview(prev => !prev)}>
+                    {showPreview ? "code" : "preview"}
+                </button> 
+                <div className="all-btns" style={{marginLeft:'00px' }}>
                 {buttons.map((button, index) => (
-                    <button
-                        style={{ all: 'unset', padding: '10px', backgroundColor: '#000', color: '#fff', border: 'none', cursor: 'pointer', transition: 'background-color 0.3s' }}
+                   <button
+                        style={{ all: 'unset', padding: '10px', backgroundColor: '#000', color: '#fff', border: 'none', cursor: 'pointer', transition: 'background-color 0.2s' }}
                         key={index}
                         className="btn"
                         onClick={() => handleButtonClick(button.markdown)}
@@ -108,8 +117,11 @@ const LeftSection = ({ data, setData, selectedIndex, handleButtonClick }) => {
                         {button.label}
                     </button>
                 ))}
-            </div><br />
+            </div></div>
+            <hr />
+            {/* <br /> */}
             <textarea
+                style={{padding:'15px'}}
                 value={data[selectedIndex]}
                 onChange={(e) => {
                     setData(prevData => {
@@ -118,16 +130,19 @@ const LeftSection = ({ data, setData, selectedIndex, handleButtonClick }) => {
                         return newData
                     })
                 }}
-                cols={100}
-                rows={20}
+                cols={140}
+                rows={30}
             />
         </div>
     )
 }
 
-const RightSection = ({ data, selectedIndex }) => {
+const RightSection = ({ data, selectedIndex, showPreview, setShowPreview }) => {
     return (
         <>
+          <button onClick={() => setShowPreview(prev => !prev)}>
+                    {showPreview ? "code" : "preview"}
+                </button>
             <Markdown>
                 {data[selectedIndex]}
             </Markdown>
